@@ -3,8 +3,9 @@
     <x-slot:heading>
         Registrar Mascota
     </x-slot:heading>
-    <form method="POST" action="{{ route('pets.store') }}">
+    <form method="POST" action="{{ route('pets.patch',$pet) }}">
         @csrf
+        @method('PUT')
         <div class="space-y-12">
             <div class="border-b border-gray-900/10 pb-12">
                 <h2 class="text-base/7 font-semibold text-gray-900">Pet registration</h2>
@@ -18,7 +19,7 @@
                                 class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                 <input type="text" name="name" id="name"
                                     class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-                                    placeholder="Nala" />
+                                    placeholder="Nala" value="{{ $pet->name }}" />
                             </div>
                             @error('name')
                                 <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
@@ -26,14 +27,15 @@
                         </div>
                     </div>
                     <div class="sm:col-span-1">
-                        <label for="birthday" class="block text-sm/6 font-medium text-gray-900">Pet´s birthday</label>
+                        <label for="birthdate" class="block text-sm/6 font-medium text-gray-900">Pet´s birthday</label>
                         <div class="mt-2">
                             <div
                                 class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                                <input type="date" name="birthday" id="birthday"
-                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" />
+                                <input type="date" name="birthdate" id="birthdate"
+                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                    value="{{ $pet->birthdate }}" />
                             </div>
-                            @error('birthday')
+                            @error('birthdate')
                                 <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -44,7 +46,8 @@
                             <div
                                 class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                 <input type="date" name="rescue_date" id="rescue_date"
-                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" />
+                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                    value="{{ $pet->rescue_date }}" />
                             </div>
                             @error('rescue_date')
                                 <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
@@ -57,10 +60,12 @@
                         <div class="mt-2 grid grid-cols-1">
                             <select id="gender" name="gender"
                                 class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                <option value="" selected disabled>--Select--</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="unknown">Unknown</option>
+                                <option value="" {{ !$pet->gender ? 'selected' : '' }} disabled>--Select--
+                                </option>
+                                <option value="male" {{ $pet->gender == 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ $pet->gender == 'female' ? 'selected' : '' }}>Female</option>
+                                <option value="unknown"{{ $pet->gender == 'unknown' ? 'selected' : '' }}>Unknown
+                                </option>
                             </select>
                             <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
                                 viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon">
@@ -80,7 +85,9 @@
                                 class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                 <option value="" selected disabled>--Select--</option>
                                 @foreach ($species as $specie)
-                                    <option value="{{ $specie->id }}">{{ $specie->name }}</option>
+                                    <option value="{{ $specie->id }}"
+                                        {{ $pet->specie_id == $specie->id ? 'selected' : '' }}>{{ $specie->name }}
+                                    </option>
                                 @endforeach
                             </select>
                             <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
@@ -101,7 +108,9 @@
                                 class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                 <option value="" selected disabled>--Select--</option>
                                 @foreach ($lifeStages as $ligestage)
-                                    <option value="{{ $ligestage->id }}">{{ $ligestage->name }}</option>
+                                    <option value="{{ $ligestage->id }}"
+                                        {{ $pet->life_stage_id == $ligestage->id ? 'selected' : '' }}>
+                                        {{ $ligestage->name }}</option>
                                 @endforeach
                             </select>
                             <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
@@ -121,11 +130,12 @@
                         <div class="mt-2 grid grid-cols-1">
                             <select id="size" name="size"
                                 class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                <option value="" selected disabled>--Select--</option>
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
+                                <option value="" {{ $pet->size == '' ? 'selected' : '' }} disabled>--Select--
+                                </option>
+                                <option value="S" {{ $pet->size == 'S' ? 'selected' : '' }}>S</option>
+                                <option value="M" {{ $pet->size == 'M' ? 'selected' : '' }}>M</option>
+                                <option value="L" {{ $pet->size == 'L' ? 'selected' : '' }}>L</option>
+                                <option value="XL" {{ $pet->size == 'XL' ? 'selected' : '' }}>XL</option>
                             </select>
                             <svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
                                 viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon">
@@ -133,16 +143,17 @@
                                     d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
                                     clip-rule="evenodd" />
                             </svg>
-                        </div>
                             @error('size')
                                 <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
                             @enderror
+                        </div>
                     </div>
                     <div class="sm:col-span-2 sm:col-start-1">
                         <label for="country" class="block text-sm/6 font-medium text-gray-900">Country</label>
                         <div class="mt-2">
                             <input type="text" name="country" id="country"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                value="{{ $pet->country }}" />
                         </div>
                     </div>
                     <div class="sm:col-span-2">
@@ -150,14 +161,16 @@
                             Province</label>
                         <div class="mt-2">
                             <input type="text" name="state"
-                                id="state"class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                id="state"class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                value="{{ $pet->state }}" />
                         </div>
                     </div>
                     <div class="sm:col-span-2 ">
                         <label for="city" class="block text-sm/6 font-medium text-gray-900">City</label>
                         <div class="mt-2">
                             <input type="text" name="city" id="city"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                value="{{ $pet->city }}" />
                         </div>
                     </div>
                     <div class="col-span-full">
@@ -165,7 +178,7 @@
                         <p class="mt-3 text-sm/6 text-gray-600">Talk about this pet's history.</p>
                         <div class="mt-2">
                             <textarea name="history" id="history" rows="3"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"></textarea>
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">{{ $pet->history }}</textarea>
                         </div>
                     </div>
                     <div class="col-span-full">
@@ -173,7 +186,7 @@
                         <p class="mt-3 text-sm/6 text-gray-600">Tell us about this pet.</p>
                         <div class="mt-2">
                             <textarea name="description" id="description" rows="3"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"></textarea>
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">{{ $pet->description }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -187,7 +200,8 @@
                         <div class="flex gap-3">
                             <div class="flex h-6 shrink-0 items-center">
                                 <div class="group grid size-4 grid-cols-1">
-                                    <input id="is_neutered" name="is_neutered" type="checkbox" checked
+                                    <input id="is_neutered" name="is_neutered" type="checkbox"
+                                        {{ $pet->is_neutered ? 'checked' : '' }}
                                         class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto" />
                                     <svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
                                         viewBox="0 0 14 14" fill="none">
@@ -206,6 +220,7 @@
                             <div class="flex h-6 shrink-0 items-center">
                                 <div class="group grid size-4 grid-cols-1">
                                     <input id="has_disability" name="has_disability" type="checkbox"
+                                        {{ $pet->has_disability ? 'checked' : '' }}
                                         class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto" />
                                     <svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
                                         viewBox="0 0 14 14" fill="none">
